@@ -1,12 +1,10 @@
 const { verify } = require("jsonwebtoken");
-const errorResponse = require("../errorResponse");
+const { errorResponse } = require("../errorResponse");
 
 module.exports = {
     validateAccreditations: (role, req, res, next) => {
-        if(role) {
-            role.push("ROLE_SUPERADMIN");
-        } else {
-            role = ["ROLE_SUPERADMIN"];
+        if(!role) {
+            role = ["ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN"];
         }
         let token = req.get("authorization");
         if(token) {
@@ -15,7 +13,7 @@ module.exports = {
                 if(error) {
                     return errorResponse(error, res);
                 } else {
-                    if(!role.includes(decoded.result.roles[0]))
+                    if(!role.includes(eval(decoded.result.roles)[0]))
                     {
                         return res.json({
                             success: 0,
